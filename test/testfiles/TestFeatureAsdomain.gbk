@@ -1,0 +1,30 @@
+LOCUS       ABC123456 10540bp LOLDNA    UNK 01-JAN-1980
+DEFINITION  Totally a real genome
+ACCESSION   ABC123456
+VERSION     ABC123456.12345
+KEYWORDS    HMM
+SOURCE      E. coli
+  ORGANISM  E.coli
+            and Sf9
+FEATURES             Location/Qualifiers
+     aSDomain        28173..28964
+                     /asDomain_id="nrpspksdomains_MT0110_Xdom03"
+                     /database="nrpspksdomains.hmm"
+                     /detection="hmmscan"
+                     /domain="TD"
+                     /evalue="1.30E-85"
+                     /locus_tag="MT0110"
+                     /score="278.1"
+                     /translation="VLLTGATGFLGRYLVLELLRRLDVDGRLICLVRAESDEDARRRLE
+                     KTFDSGDPELLRHFKELAADRLEVVAGDKSEPDLGLDQPMWRRLAETVDLIVDSAAMVN
+                     AFPYHELFGPNVAGTAELIRIALTTKLKPFTYVSTADVGAAIEPSAFTEDADIRVISPT
+                     RTVDGGWAGGYGTSKWAGEVLLREANDLCALPVAVFRCGMILADTSYAGQLNMSDWVTR
+                     MVLSLMATGIAPRSFYEPDSEGNRQRAHFDGLPVTFVAEAIA"
+ORIGIN
+        1 aagctttggg cattggccac aatcgggcca caatcgaaag ccgagcaggt ggaaccgaaa
+       61 cgcagtcgcc tcgtcgtatg tgcacccgag ccatcgcacg cgcgggaatt cccggatgtc
+      121 gccgtattct ccggcggccg ggctaacgca tcccaggccg aacggttggc tcgtgccgtg
+      181 ggtcgcgtgt tggccgatcg gggcgtcacc gggggtgctc gggtgcggct gaccatggcg
+      241 aactgcgccg atgggccgac gctggtgcag ataaacctgc aggtaggtga caccccatta
+      301 agggcgcagg ccgccaccgc gggcatcgat gatctgcgac ccgcactgat cagactggat
+//

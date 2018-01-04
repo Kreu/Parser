@@ -1,0 +1,54 @@
+LOCUS       ABC123456 10540bp LOLDNA    UNK 01-JAN-1980
+DEFINITION  Totally a real genome
+ACCESSION   ABC123456
+VERSION     ABC123456.12345
+KEYWORDS    HMM
+SOURCE      E. coli
+  ORGANISM  E.coli
+            and Sf9
+FEATURES             Location/Qualifiers
+     cluster         1..49384
+                     /clusterblast="2. JKYW01000001_c1	Mycobacterium
+                     tuberculosis MAL020157 adOYz-supercont1.1.C1... (93% of
+                     genes show similarity)"
+                     /clusterblast="3. JKGQ01000001_c1	Mycobacterium
+                     tuberculosis BTB06-001 adOWX-supercont1.1.C1... (93% of
+                     genes show similarity)"
+                     /clusterblast="4. JKFG01000001_c1	Mycobacterium
+                     tuberculosis BTB08-283 adTxx-supercont1.1.C1... (93% of
+                     genes show similarity)"
+                     /clusterblast="5. JJSH01000013_c1	Mycobacterium
+                     tuberculosis NRITLD20 adPad-supercont1.11.C1... (93% of
+                     genes show similarity)"
+                     /clusterblast="6. CP002992_c1	Mycobacterium tuberculosis
+                     CTRI-2, complete genome. (93% of genes show similarity)"
+                     /clusterblast="7. JKFP01000001_c1	Mycobacterium
+                     tuberculosis BTB08-001 adTxi-supercont1.1.C1... (93% of
+                     genes show similarity)"
+                     /clusterblast="8. JKUF01000001_c1	Mycobacterium
+                     tuberculosis TB_RSA87 adOVU-supercont1.1.C1,... (93% of
+                     genes show similarity)"
+                     /clusterblast="9. JKUE01000001_c1	Mycobacterium
+                     tuberculosis TB_RSA88 adOVy-supercont1.1.C1,... (93% of
+                     genes show similarity)"
+                     /clusterblast="10. JKTG01000053_c1	Mycobacterium
+                     tuberculosis TB_RSA113 adOVe-supercont1.7.C... (93% of
+                     genes show similarity)"
+                     /clusterblast="11. JKSG01000017_c1	Mycobacterium
+                     tuberculosis TB_RSA141 adPeA-supercont1.5.C... (93% of
+                     genes show similarity)"
+                     /note="Cluster number: 1"
+                     /note="Detection rule(s) for this cluster type: nrps:
+                     ((Condensation & AMP-binding) or (Condensation & A-OX) or
+                     cluster(Condensation,AMP-binding));"
+                     /note="Monomers prediction: (nrp) + (lys-phe)"
+                     /note="Structure image: structures/genecluster1.png"
+                     /product="nrps"
+ORIGIN
+        1 aagctttggg cattggccac aatcgggcca caatcgaaag ccgagcaggt ggaaccgaaa
+       61 cgcagtcgcc tcgtcgtatg tgcacccgag ccatcgcacg cgcgggaatt cccggatgtc
+      121 gccgtattct ccggcggccg ggctaacgca tcccaggccg aacggttggc tcgtgccgtg
+      181 ggtcgcgtgt tggccgatcg gggcgtcacc gggggtgctc gggtgcggct gaccatggcg
+      241 aactgcgccg atgggccgac gctggtgcag ataaacctgc aggtaggtga caccccatta
+      301 agggcgcagg ccgccaccgc gggcatcgat gatctgcgac ccgcactgat cagactggat
+//
