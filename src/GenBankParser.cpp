@@ -5,6 +5,7 @@
 #include "GenBankFeature.h"
 
 using KeywordSpacer = int;
+//using DomainInfo = std::vector<std::tuple<size_t, size_t, std::string>>;
 
 GenBankParser::GenBankParser(const std::string& filename) : Parser(filename) {
 	ParseHeader();
@@ -47,7 +48,7 @@ void GenBankParser::ParseHeader() {
 	//A header ends and the next keyword is:
 	//FEATURES             Location/Qualifiers
 
-	//The code loops through the file and finds the keywords. It creates a GenBank 
+	//The code loops through the file and finds the keywords. It creates a GenBank
 	//object that is a wrapper for all of the data contained within.
 
 	std::string current_line, header_keyword;
@@ -57,7 +58,7 @@ void GenBankParser::ParseHeader() {
 	while (getline(file, current_line)) {
 
 		bool found_header_keyword = false;
-	
+
 		//If we hit "FEATURE", this means we are out of the header and need to stop.
 		if (current_line.find("FEATURES") != std::string::npos) {
 			header_ = std::make_unique<Header>(Header(header_content));
@@ -70,7 +71,7 @@ void GenBankParser::ParseHeader() {
 			return;
 		}
 
-		//Detect whether the line contains a keyword. The keywords are guaranteed 
+		//Detect whether the line contains a keyword. The keywords are guaranteed
 		//to be 12 characters wide and always at the beginning of a line. Easiest
 		//way is to grab the first 12 characters and see if it's all spaces or not.
 		constexpr int HEADER_KEYWORD_WIDTH = 12;
@@ -200,13 +201,13 @@ void GenBankParser::ParseFeatures() {
 
 		found_feature_keyword = false;
 
-		//Detect whether the line contains a keyword. The keywords are guaranteed 
+		//Detect whether the line contains a keyword. The keywords are guaranteed
 		//to be 21 characters wide and always at the beginning of a line. Easiest
 		//way is to grab the first 21 characters and see if it's all spaces or not.
 		constexpr int FEATURE_KEYWORD_WIDTH = 21;
 		std::string search_for_keyword = current_line.substr(0, FEATURE_KEYWORD_WIDTH);
 		if (search_for_keyword.find_first_not_of(' ') != std::string::npos) {
-			
+
 			//Set the flag that we found the keyword
 			found_feature_keyword = true;
 
@@ -262,35 +263,20 @@ std::shared_ptr<Header>& GenBankParser::GetHeader() {
 	return header_;
 }
 
-Parser::LinkerMap GenBankParser::FindInterdomainLinkers (FeatureMap& domains, FeatureMap& modules, int add_to_begin, int add_to_end) {
+Parser::LinkerMap GenBankParser::FindInterdomainLinkers (FeatureMap& domains, FeatureMap& modules, size_t add_to_begin, size_t add_to_end) {
 
 	//TO-DO
 	//Implement add_to_begin and add_to_end to get longer linkers that "eat"
 	//into the domains.
-
+	
 	std::map<std::string, std::vector<std::string>> linkers;
-
 	for (const auto& m : modules) {
 		const auto& m_tag = m->GetQualifierContent("locus_tag");
 		const auto& m_trans = m->GetQualifierContent("translation");
 
 		//Iterate through the domains and find the starting positions and
 		//lenghts of these domains in each module.
-		std::vector<std::tuple<size_t, size_t, std::string>> domain_location_length_type;
-		std::string domain_type;
-
-		for (const auto& d : domains) {
-			domain_type = d->GetQualifierContent("domain");
-			const auto& d_tag = d->GetQualifierContent("locus_tag");
-			if (m_tag == d_tag) {
-				const auto&  d_trans = d->GetQualifierContent("translation");
-				std::size_t domain_start_pos = m_trans.find(d_trans);
-				if (domain_start_pos != std::string::npos) {
-					auto domain_pos_and_len = std::make_tuple(domain_start_pos, d_trans.length(), domain_type);
-					domain_location_length_type.push_back(std::move(domain_pos_and_len));
-				}
-			}
-		}
+		DomainInfo domain_location_length_type = GetDomainStartLengthAndType(domains, m_tag, m_trans);
 		//Sort the vector based on the first element (location)
 		//They should already be sorted but just in case they are not...
 		std::sort(domain_location_length_type.begin(), domain_location_length_type.end());
@@ -298,23 +284,64 @@ Parser::LinkerMap GenBankParser::FindInterdomainLinkers (FeatureMap& domains, Fe
 		//Have all the domain locations, now find the linkers
 		for (auto it = domain_location_length_type.begin(); it != domain_location_length_type.end(); ++it) {
 			auto next_element = it + 1;
-			std::size_t current_domain_end = std::get<0>(*it) + std::get<1>(*it);
+			auto current_domain_start = std::get<0>(*it);
+			auto current_domain_length = std::get<1>(*it);
+			std::size_t module_length = m_trans.length();
+			std::size_t current_domain_end = current_domain_start + current_domain_length;
+			//Need to verify that my add_to_begin and add_to_end variables don't cause out
+			//of range errors.
+			if (current_domain_start <= add_to_begin) {
+				std::cout << "Add_to_begin(" << current_domain_start - add_to_begin << ") would exceed module_length (" << module_length << ").\n";
+				add_to_begin = 0;
+			}
+			
+			if ((current_domain_end + add_to_end) > module_length) {
+				std::cout << "Add_to_end(" << current_domain_end + add_to_end << ") would exceed module_length (" << module_length << ").\n";
+				add_to_end = 0;
+			}
+			
+			//Safety check to make sure we don't dereference a non-existent element
 			if (next_element != domain_location_length_type.end()) {
 				std::size_t next_domain_start = std::get<0>(*next_element);
-				std::size_t linker_distance = next_domain_start - current_domain_end;
-
+				//Because adding the linkers changes the location of the substring, we have to add to both the beginning
+				//and end linker lenghts to this variable.
+				std::size_t linker_length = next_domain_start + add_to_end - current_domain_end + add_to_begin;
+				
 				auto current_domain_type = std::get<2>(*it);
 				auto next_domain_type = std::get<2>(*next_element);
+				
 				std::string linker_type = current_domain_type + "-" + next_domain_type;
-				//std::cout << "current domain_type: " << std::get<2>(*it) << "\n";
-				//std::cout << "next domain_type: " << std::get<2>(*next_element) << "\n";
 
-				linkers[linker_type].push_back(m_trans.substr(current_domain_end, linker_distance));
-				//std::cout << "Current end: " << current_domain_end << ". Next start: " << next_domain_start << ". Linker length: " << linker_distance << "\n";
-				//std::cout << "Tag: " << m_tag << ". Interdomain linker is " << m_trans.substr(current_domain_end, linker_distance) << "\n";
+				// std::cout << "cur_domain_end " << current_domain_end << "\n";
+				// std::cout << "linker_length " << linker_length << "\n";
+				// std::cout << "next_domain_start " << next_domain_start << "\n";
+				// std::cout << "add_to_begin " << add_to_begin << "\n";
+				// std::cout << "add_to_end " << add_to_end << "\n";
+
+
+				linkers[linker_type].push_back(m_trans.substr(current_domain_end - add_to_begin, linker_length));
 				continue;
 			}
 		}
 	}
 	return linkers;
 }
+
+GenBankParser::DomainInfo GenBankParser::GetDomainStartLengthAndType(const FeatureMap& domains, const std::string& m_tag, const std::string& m_trans) {
+	DomainInfo domain_location_length_type;
+	std::string domain_type;
+	for (const auto& d : domains) {
+		domain_type = d->GetQualifierContent("domain");
+		const auto& d_tag = d->GetQualifierContent("locus_tag");
+		if (m_tag == d_tag) {
+			const auto&  d_trans = d->GetQualifierContent("translation");
+			std::size_t domain_start_pos = m_trans.find(d_trans);
+			if (domain_start_pos != std::string::npos) {
+				auto domain_pos_len_type = std::make_tuple(domain_start_pos, d_trans.length(), domain_type);
+				domain_location_length_type.push_back(domain_pos_len_type);
+			}
+		}
+	}
+	return domain_location_length_type;
+}
+

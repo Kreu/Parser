@@ -7,7 +7,7 @@ GenBankFeature::GenBankFeature(const std::map<std::string, std::vector<std::stri
 	//that contains each line of the original record file as a separate string
 	//For example, the following feature:
 	//gene            29559..31544
-	//				  /locus_tag = "MT0111"
+	//          /locus_tag = "MT0111"
 	//would produce a map with the key "gene" and a vector with "/locus_tag = "MT0111".
 
 	//Check that the map contains only one key.
@@ -35,7 +35,7 @@ void GenBankFeature::PrintFeature() {
 	std::cout << "\t" << start_location << " to " << stop_location << "\n";
 	for (const auto& c : content_) {
 		std::cout << "\t" << c.first << ": ";
-		std::cout << "\t" << c.second << "\n";		
+		std::cout << "\t" << c.second << "\n";    
 	}
 }
 
@@ -43,8 +43,8 @@ void GenBankFeature::UnpackFeatureContent(const std::map<std::string, std::vecto
 	//Unpack the map and create a map. The keys are feature types, and the values are strings
 	//For example:
 	//  asDomain_id = "nrpspksdomains_MT0110_Xdom03"
-	//	database = "nrpspksdomains.hmm"
-	//	detection = "hmmscan"
+	//  database = "nrpspksdomains.hmm"
+	//  detection = "hmmscan"
 	//Would create a map with three keys "asDomain_id", "database" and "detection" with values
 	//of "nrpspksdomains_MT0110_Xdom03", "nrpspksdomains.hmm" and "hmmscan", respectively. 
 
@@ -59,7 +59,6 @@ void GenBankFeature::UnpackFeatureContent(const std::map<std::string, std::vecto
 	for (const auto& k : content) {
 		type_ = k.first;
 
-		size_t type_content_delimiter_pos{ 0 };
 		std::string qualifier_content, qualifier_type;
 		std::string STRING_SPACER{ " " };
 

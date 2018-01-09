@@ -28,3 +28,5 @@ File::File(const char* filename) {
 std::fstream& File::GetStream() {
 	return file_;
 }
+
+//File::File(const File& rhs) : file_(rhs.file_) { };

@@ -1,39 +1,25 @@
-// NRPS.cpp : Defines the entry point for the console application.
-//
-
 #include "stdafx.h"
-//#include "ParserTests.h"
-//#include "GenBankParserTests.h"
-
 #include "GenBankParser.h"
 #include "Header.h"
 #include "Feature.h"
 #include "GenBankFeature.h"
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/fstream.hpp>
 
-//Include for testing purposes
-#include "ParserTests.h"
-#include "GenBankParserTests.h"
 
 int main()
 {
+	//To-DO
+	//Get arguments for folder and linker lenghts from the command line
+	
 	auto t1 = std::chrono::high_resolution_clock::now();
-
-	//Run tests
-	const bool TESTS_ENABLED = 0;
-	if (TESTS_ENABLED) {
-		ParserTests::TestAll();
-		GenBankParserTests::TestAll();
-	}
-
-	std::experimental::filesystem::path path = "C:\\Users\\Valdeko\\Desktop\\BGC_downloader\\New_Sequences";
-	//std::experimental::filesystem::path path = "C:\\Users\\Valdeko\\source\\repos\\NRPS\\Sequences";
-	//std::experimental::filesystem::path path = "C:\\Users\\Valdeko\\source\\repos\\NRPS\\Tests";
-
-	/*Parser::LinkerMap all_linkers;*/
+	boost::filesystem::path path = "/media/sf_BGC_downloader/New_Sequences/";
 	int counter{ 1 };
-	for (auto& file : std::experimental::filesystem::directory_iterator(path)) {
+	
+	for (auto& file : boost::filesystem::directory_iterator(path)) {
 		try {
-			Parser& parser = GenBankParser(file.path().string());
+			std::string file_to_open = file.path().string();
+			GenBankParser parser(file_to_open);
 			std::vector<std::shared_ptr<Feature>> modules, domains;
 
 			std::vector<std::shared_ptr<Feature>> CDS_features = parser.GetFeatureByType("CDS");
@@ -48,12 +34,13 @@ int main()
 			for (const auto& as_domains : aSDomains) {
 				domains.push_back(std::move(as_domains));
 			}
-			Parser::LinkerMap linkers = parser.FindInterdomainLinkers(domains, modules);
+			Parser::LinkerMap linkers = parser.FindInterdomainLinkers(domains, modules, 40, 40);
 
-			//Will create duplicates because same linker can be in different clusters.
+			//Algorithm creates duplicates because same linker can be in different clusters. So we
+			//need to make them unique at least across a module, and later across the file.
 			for (const auto& l : linkers) {
-				std::string file_name = ".\\Linkers\\" + l.first + ".txt";
-				std::ofstream output_file(file_name, std::ios::out | std::ios::app);
+				std::string file_name = "/media/sf_BGC_downloader/New_Sequences/Linkers/" + l.first + ".txt";
+				boost::filesystem::ofstream output_file(file_name, std::ios::out | std::ios::app);
 				std::set<std::string> unique_linkers{ l.second.begin(), l.second.end() };
 				for (const auto& x : unique_linkers) {
 					output_file << ">" << counter << "\n";
@@ -69,9 +56,9 @@ int main()
 
 	counter = 1;
 	//Fix this..This is idiotic but will do for now. 
-	std::experimental::filesystem::path linker_files = "C:\\Users\\Valdeko\\source\\repos\\NRPS\\NRPS\\Linkers";
-	for (auto& file : std::experimental::filesystem::directory_iterator(linker_files)) {
-		std::ifstream input_file(file, std::ios::in);
+	boost::filesystem::path linker_files = "/media/sf_BGC_downloader/New_Sequences/Linkers/";
+	for (auto& file : boost::filesystem::directory_iterator(linker_files)) {
+		boost::filesystem::ifstream input_file(file, std::ios::in);
 		std::string current_line;
 		std::set<std::string> unique_linkers;
 
@@ -81,12 +68,12 @@ int main()
 
 		while (getline(input_file, current_line)) {
 			if (current_line.find(">")) {
-				std::cout << "Appending " << current_line << "\n";
+				//std::cout << "Appending " << current_line << "\n";
 				unique_linkers.insert(current_line);
 			}
 		}
 
-		std::ofstream output_file(file);
+		boost::filesystem::ofstream output_file(file);
 		for (const auto& x : unique_linkers) {
 			output_file << ">" << counter << "\n";
 			output_file << x << "\n";
@@ -94,26 +81,10 @@ int main()
 		}
 	}
 
-
-	//std::map<int, int> a = { {0, 4}, {1, 6}, {3, 10} };
-	//std::map<int, int> b = { { 2, 8 },{ 1, 11 },{ 3, 10 } };
-	//a.insert(b.begin(), b.end());
-	//for (const auto& x : a) {
-	//	std::cout << x.first << " : " << x.second << "\n";
-	//}
-
-
-	////for (const auto& l : all_linkers) {
-	////	std::cout << "Linker type: " << l.first << "\n";
-	////	for (const auto& x : l.second) {
-	////		std::cout << x << "\n";
-	////	}
-	////}
-
 	auto t2 = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
 
 	std::cout << "Execution took " << duration << " milliseconds\n";
-    return 0;
+	return 0;
 }
 

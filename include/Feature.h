@@ -4,7 +4,6 @@
 class Feature {
 //For testing purposes
 friend class GenBankParserTests;
-
 protected:
 	std::string type_;
 	std::map<std::string, std::string> content_;
@@ -19,5 +18,5 @@ public:
 	const std::map<std::string, std::string>&  GetContent();
 	bool Find(const std::string& qualifier) const;
 	bool Find(const std::string& qualifier, const std::string& search_term) const;
-	const std::string& Feature::GetQualifierContent(const std::string& qualifier);
+	const std::string& GetQualifierContent(const std::string& qualifier);
 };
